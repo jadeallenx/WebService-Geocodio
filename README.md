@@ -4,7 +4,7 @@ WebService::Geocodio - A Perl interface to Geocod.io
 
 # VERSION
 
-version 0.01
+version 0.02
 
 # SYNOPSIS
 
