@@ -6,7 +6,10 @@ use Test::More;
 
 BEGIN { 
     if (! $ENV{GEOCODIO_API_KEY} ) {
-        say "Set GEOCODIO_API_KEY to run these tests.";
+        plan skip_all => "Set GEOCODIO_API_KEY to run these tests.";
+    }
+    else {
+        plan tests => 1;
     }
 };
 
@@ -28,4 +31,3 @@ $geo->add_location($loc, '20050');
 map { say $_->city, ": ", $_->lat, ", ", $_->lng, "\n" } $geo->geocode();
 
 ok(1);
-done_testing();
