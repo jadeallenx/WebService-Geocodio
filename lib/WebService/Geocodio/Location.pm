@@ -6,10 +6,63 @@ package WebService::Geocodio::Location;
 use Moo;
 use Carp qw(confess);
 
+# ABSTRACT: Location object for use with Geocod.io service.
+
+=attr number
+
+Buiding number
+
+=attr street
+
+A street name identifier
+
+=attr suffix
+
+The type of street 'Ave', 'St', etc.
+
+=attr city
+
+The city where the streets have no name.
+
+=attr state
+
+State wherein city is located
+
+=attr zip
+
+The postal zip code
+
+You B<must> have either a zip code OR a city/state pair.
+
+=attr lat
+
+The latitude of the location
+
+=attr lng
+
+The longitude of the location
+
+=attr accuracy
+
+A float from 0 -> 1 representing the confidence of the lookup results
+
+=attr formatted
+
+The full address as formatted by the service.
+
+=cut
+
 has [qw(number street suffix city state zip formatted lat lng accuracy)] => (
     is => 'ro',
     predicate => 1,
 );
+
+=method new
+
+The constructor accepts either a bare string OR a list of key/value pairs where the keys are
+the attribute names.
+
+=cut
 
 sub BUILDARGS {
     my ( $class, @args ) = @_;
