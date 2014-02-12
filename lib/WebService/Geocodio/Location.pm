@@ -3,8 +3,9 @@ use warnings;
 
 package WebService::Geocodio::Location;
 
-use Moo;
+use Moo::Lax;
 use Carp qw(confess);
+with 'WebService::Geocodio::ForwardJSON';
 
 # ABSTRACT: Location object for use with Geocod.io service.
 
@@ -59,8 +60,8 @@ has [qw(number street suffix city state zip formatted lat lng accuracy)] => (
 
 =method new
 
-The constructor accepts either a bare string OR a list of key/value pairs where the keys are
-the attribute names.
+The constructor accepts either a bare string OR a list of key/value pairs where
+the keys are the attribute names.
 
 =cut
 
@@ -85,29 +86,5 @@ sub BUILDARGS {
     return $out;
 }
 
-sub TO_JSON {
-    my $self = shift;
-
-    return $self->formatted if $self->has_formatted;
-
-    if ( ( not $self->has_zip ) && ( not ( $self->has_city && $self->has_state ) ) ) {
-        confess "A zip or city, state pair is required.\n";
-    }
-
-    my $s;
-    if ( $self->has_number && $self->has_street && $self->suffix ) {
-        $s .= join " ", (map { $self->$_ } qw(number street suffix));
-        $s .= ", ";
-    }
-
-    if ( $self->has_zip ) {
-        $s .= $self->zip
-    }
-    else {
-        $s .= join ", ", (map { $self->$_ } qw(city state));
-    }
-
-    return $s;
-}
 
 1;

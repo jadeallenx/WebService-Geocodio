@@ -3,7 +3,7 @@ use warnings;
 
 package WebService::Geocodio;
 
-use Moo;
+use Moo::Lax;
 use Carp qw(confess);
 with('WebService::Geocodio::Request');
 
@@ -41,18 +41,17 @@ with('WebService::Geocodio::Request');
 
 =head1 OVERVIEW
 
-This module is a fairly thin wrapper around the L<Geocod.io|http://geocod.io> geocoding web service.
-This service currently only supports US based addresses and "forward" geocoding where you have a postal
-address and want to convert to latitude/longitude pair.  The library is somewhat finicky about 
-how addresses are presented and stored; please read the API documentation thoroughly to make sure
-you're getting the best quality results from the service.
-
-More countries and reverse geocoding (lat/lng -> postal address) are planned for future releases.
+This module is a fairly thin wrapper around the L<Geocod.io|http://geocod.io>
+geocoding web service.  This service currently only supports US based addresses
+and "forward" geocoding where you have a postal address and want to convert to
+latitude/longitude pair.  The library is somewhat finicky about how addresses
+are presented and stored; please read the API documentation thoroughly to make
+sure you're getting the best quality results from the service.
 
 You will need to obtain a free API key to use this library.
 
-All errors are fatal and reported by confess.  If you want more graceful error handling, you might
-want to try using L<Try::Tiny>.
+All errors are fatal and reported by C<confess>.  If you want more graceful
+error handling, you might want to try using L<Try::Tiny>.
 
 =cut
 
@@ -123,9 +122,9 @@ Send the current list of locations to the geocod.io service.
 
 Returns undef if there are no locations stored.
 
-In a list context, returns a list of L<WebService::Geocodio::Location> objects.  In a scalar context,
-returns an arrayref of L<WebService::Geocodio::Location> objects. The list of objects is presented
-in descending order of accuracy.
+In a list context, returns a list of L<WebService::Geocodio::Location> objects.
+In a scalar context, returns an arrayref of L<WebService::Geocodio::Location>
+objects. The list of objects is presented in descending order of accuracy.
 
 =cut
 
@@ -134,9 +133,41 @@ sub geocode {
 
     return undef if scalar @{$self->locations} < 1;
 
-    my @r = $self->send($self->locations);
+    my @r = $self->send_forward($self->locations);
 
     wantarray ? return @r : return \@r;
+}
+
+=method reverse_geocode
+
+Send the current list of latitude, longitude pairs to the geocod.io service.
+
+Returns undef if there are no locations stored.
+
+In a list context, returns a list of L<WebService::Geocodio::Location> objects.
+In scalar context, returns an arrayref of L<WebService::Geocodio::Location> 
+objects.  The list of objects is presented in descending order of accuracy.
+
+=cut
+
+sub reverse_geocode {
+    my $self = shift;
+
+    return undef if scalar @{$self->locations} < 1;
+
+    my @r = $self->send_reverse($self->locations);
+
+    wantarray ? return @r : return \@r;
+}
+
+=method reverse
+
+Synonym for reverse_geocode
+
+=cut
+
+sub reverse {
+    $_[0]->reverse_geocode(shift);
 }
 
 1;
