@@ -17,11 +17,11 @@ my $loc = WebService::Geocodio::Location->new(
 );
 
 isa_ok($loc, 'WebService::Geocodio::Location');
-is($loc->TO_JSON, '1060 W Addison St, Chicago, IL', 'TO_JSON serializes properly');
+is($loc->_forward_formatting, '1060 W Addison St, Chicago, IL', 'forward serializes properly');
 
 my $loc1 = WebService::Geocodio::Location->new('1600 Pennsylvania Ave NW, Washington, DC');
 isa_ok($loc1, 'WebService::Geocodio::Location');
-is($loc1->TO_JSON, '1600 Pennsylvania Ave NW, Washington, DC', 'TO_JSON serializes properly');
+is($loc1->_forward_formatting, '1600 Pennsylvania Ave NW, Washington, DC', 'forward serializes properly');
 
 my $json_str = <<_EOF;
 {
@@ -85,7 +85,7 @@ my $obj = $json->decode($json_str);
 my @l = map { WebService::Geocodio::Location->new($_) } map {; @{ $_->{response}->{results} } } @{ $obj->{results} };
 isa_ok($l[0], 'WebService::Geocodio::Location');
 isa_ok($l[1], 'WebService::Geocodio::Location');
-is($l[0]->TO_JSON, $l[1]->TO_JSON, 'JSON serializes same');
+is($l[0]->_forward_formatting, $l[1]->_forward_formatting, 'JSON serializes same');
 is($l[0]->formatted, $l[1]->formatted, 'formatted address same');
 isnt($l[0]->lng, $l[1]->lng, 'Longitude not same');
 isnt($l[0]->lat, $l[1]->lat, 'Latitude not same');
@@ -96,7 +96,7 @@ my $loc2 =  WebService::Geocodio::Location->new(
 );
 
 isa_ok($loc2, 'WebService::Geocodio::Location');
-is($loc2->TO_JSON, 77056, 'JSON serializes properly');
+is($loc2->_forward_formatting, 77056, 'JSON serializes properly');
 
 my $loc3 =  WebService::Geocodio::Location->new(
     city => 'Houston',
@@ -104,7 +104,7 @@ my $loc3 =  WebService::Geocodio::Location->new(
 );
 
 isa_ok($loc3, 'WebService::Geocodio::Location');
-is($loc3->TO_JSON, 'Houston, TX', 'JSON serializes properly');
+is($loc3->_forward_formatting, 'Houston, TX', 'JSON serializes properly');
 
 my $loc4 =  WebService::Geocodio::Location->new(
     city => 'Houston',
@@ -113,4 +113,4 @@ my $loc4 =  WebService::Geocodio::Location->new(
 );
 
 isa_ok($loc4, 'WebService::Geocodio::Location');
-is($loc4->TO_JSON, 77056, 'JSON serialization prefers zip');
+is($loc4->_forward_formatting, 77056, 'JSON serialization prefers zip');

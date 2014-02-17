@@ -19,7 +19,8 @@ my $geo = WebService::Geocodio->new(
 
 isa_ok($geo, 'WebService::Geocodio');
 
-my @response = $geo->send(['77056', '77450']);
+my @response = $geo->geocode(['77056', '77450']);
+diag @response;
 
 is($response[0]->city, "Houston", "Got right city");
 is($response[0]->state, "TX", "Got right state");

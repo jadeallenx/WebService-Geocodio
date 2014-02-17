@@ -8,6 +8,8 @@ use HTTP::Tiny;
 use Carp qw(confess);
 use WebService::Geocodio::Location;
 
+with 'WebService::Geocodio::JSON';
+
 # ABSTRACT: A request role for Geocod.io
 
 =attr ua
@@ -20,7 +22,7 @@ has 'ua' => (
     is => 'ro',
     lazy => 1,
     default => sub { HTTP::Tiny->new(
-        agent => "WebService-Geocodio/$VERSION ",
+        agent => "WebService-Geocodio ",
         default_headers => { 'Content-Type' => 'application/json' },
     ) },
 );
@@ -50,7 +52,7 @@ Any API errors are fatal and reported by C<Carp::confess>.
 sub send_forward {
     my $self = shift;
 
-    $self->_request('geocode', $self->encode('f', shift));
+    $self->_request('geocode', $self->encode(@_));
 }
 
 =method send_reverse
@@ -66,7 +68,7 @@ Any API errors are fatal and reported by C<Carp::confess>.
 sub send_reverse {
     my $self = shift;
 
-    $self->_request('reverse', $self->encode('r', shift));
+    $self->_request('reverse', $self->encode(@_));
 }
 
 sub _request {
@@ -76,7 +78,7 @@ sub _request {
         . "$op?api_key=" . $self->api_key, { content => $content });
 
     if ( $response->{success} ) {
-        my $hr = $self->json->decode($response->{content});
+        my $hr = $self->decode($response->{content});
         return map { WebService::Geocodio::Location->new($_) } 
             map {; @{$_->{response}->{results}} } @{$hr->{results}};
     }

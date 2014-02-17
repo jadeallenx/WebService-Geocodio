@@ -5,6 +5,7 @@ package WebService::Geocodio;
 
 use Moo::Lax;
 use Carp qw(confess);
+use Scalar::Util qw(blessed);
 with('WebService::Geocodio::Request');
 
 # ABSTRACT: A Perl interface to Geocod.io
@@ -133,7 +134,7 @@ sub geocode {
 
     return undef if scalar @{$self->locations} < 1;
 
-    my @r = $self->send_forward($self->locations);
+    my @r = $self->send_forward( $self->_format('forward') );
 
     wantarray ? return @r : return \@r;
 }
@@ -155,9 +156,19 @@ sub reverse_geocode {
 
     return undef if scalar @{$self->locations} < 1;
 
-    my @r = $self->send_reverse($self->locations);
+    my @r = $self->send_reverse( $self->_format('reverse') );
 
     wantarray ? return @r : return \@r;
+}
+
+sub _format {
+    my $self = shift;
+    my $direction = shift;
+
+    my $method = $direction eq 'forward' ? '_forward_formatting' 
+        : '_reverse_formatting';
+
+    return [ map {; blessed $_ ? $_->$method->() : $_ } @{$self->locations} ];
 }
 
 =method reverse

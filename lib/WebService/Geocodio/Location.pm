@@ -5,7 +5,6 @@ package WebService::Geocodio::Location;
 
 use Moo::Lax;
 use Carp qw(confess);
-with 'WebService::Geocodio::ForwardJSON';
 
 # ABSTRACT: Location object for use with Geocod.io service.
 
@@ -84,6 +83,41 @@ sub BUILDARGS {
     }
 
     return $out;
+}
+
+sub _forward_formatting {
+    my $self = shift;
+
+    return $self->formatted if $self->has_formatted;
+
+    if ( ( not $self->has_zip ) && ( not ( $self->has_city && $self->has_state ) ) ) {
+        confess "A zip or city-state pair is required.\n";
+    }
+
+    my $s;
+    if ( $self->has_number && $self->has_street && $self->suffix ) {
+        $s .= join " ", (map {; $self->$_ } qw(number street suffix));
+        $s .= ", ";
+    }
+
+    if ( $self->has_zip ) {
+        $s .= $self->zip
+    }
+    else {
+        $s .= join ", ", (map {; $self->$_ } qw(city state));
+    }
+
+    return $s;
+}
+
+sub _reverse_formatting {
+    my $self = shift;
+
+    if ( not ( $self->has_lat && $self->has_lng ) ) {
+        confess "lat-lng pair is required\n";
+    }
+
+    return join ",", ( map {; $self->$_ } qw(lat lng) );
 }
 
 
