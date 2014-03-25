@@ -183,7 +183,7 @@ Fields that do not match these valid names are silently discarded.
 sub add_field {
     my $self = shift;
 
-    push @{ $self->field }, grep { /cd|cd113|stateleg|timezone|school/ } @_;
+    push @{ $self->fields }, grep { /cd|cd113|stateleg|timezone|school/ } @_;
 }
 
 =method geocode
