@@ -4,7 +4,7 @@ WebService::Geocodio - A Perl interface to Geocod.io
 
 # VERSION
 
-version 0.02
+version 0.03
 
 # SYNOPSIS
 
@@ -19,7 +19,8 @@ version 0.02
     # Wrigley Field
     my $loc = WebService::Geocodio::Location->new(
         number => 1060,
-        street => 'W Addison',
+        postdirection => 'W',
+        street => 'Addison',
         suffix => 'Street',
         city => 'Chicago',
         state => 'IL',
@@ -38,18 +39,18 @@ version 0.02
 
 # OVERVIEW
 
-This module is a fairly thin wrapper around the [Geocod.io](http://geocod.io) geocoding web service.
-This service currently only supports US based addresses and "forward" geocoding where you have a postal
-address and want to convert to latitude/longitude pair.  The library is somewhat finicky about 
-how addresses are presented and stored; please read the API documentation thoroughly to make sure
-you're getting the best quality results from the service.
+This module is a fairly thin wrapper around the [Geocod.io](http://geocod.io)
+geocoding web service.  This service currently only supports US based addresses
+at the moment.  Both forward and reverse geocoding is supported. 
 
-More countries and reverse geocoding (lat/lng -> postal address) are planned for future releases.
+In my testing, the service is somewhat finicky about how addresses are
+presented and stored; please read the service API documentation thoroughly 
+to make sure you're getting the best quality results from the service.
 
 You will need to obtain a free API key to use this library.
 
-All errors are fatal and reported by confess.  If you want more graceful error handling, you might
-want to try using [Try::Tiny](http://search.cpan.org/perldoc?Try::Tiny).
+All errors are fatal and reported by `confess`.  If you want more graceful
+error handling, you might want to try using [Try::Tiny](http://search.cpan.org/perldoc?Try::Tiny).
 
 # ATTRIBUTES
 
@@ -62,6 +63,33 @@ This is the geocod.io API key. It is required.
 The list of locations you want to geocode.  These can be bare strings (if you like) or
 you can use a fancy object like [WebService::Geocodio::Location](http://search.cpan.org/perldoc?WebService::Geocodio::Location) which will serialize
 itself to JSON automatically.
+
+## fields
+
+You may request the following fields be included in the results:
+
+- cd
+
+    Congressional District (for the current Congress)
+
+- cd113
+
+    Congressional District (for the 113th Congress which runs through 2015)
+
+- stateleg
+
+    The state legislative divisions for this location. The results include both
+    House and Senate, unless the location is unicameral like Nebraska or Washington
+    D.C., then only a senate result is given.
+
+- timezone
+
+    The timezone of this location, UTC offset and whether it observes daylight
+    saving time.
+
+- school
+
+    The unified or elementary/secondary school district identifiers for this location.
 
 # METHODS
 
@@ -77,15 +105,37 @@ Show the locations currently set for geocoding.
 
 If you want to clear the current list of locations, use this method.
 
+## add\_field
+
+This method takes one or more fields to include in a result set. Valid fields are:
+
+- cd
+- cd113
+- stateleg
+- timezone
+- school
+
+Fields that do not match these valid names are silently discarded. 
+
 ## geocode
 
 Send the current list of locations to the geocod.io service.
 
 Returns undef if there are no locations stored.
 
-In a list context, returns a list of [WebService::Geocodio::Location](http://search.cpan.org/perldoc?WebService::Geocodio::Location) objects.  In a scalar context,
-returns an arrayref of [WebService::Geocodio::Location](http://search.cpan.org/perldoc?WebService::Geocodio::Location) objects. The list of objects is presented
-in descending order of accuracy.
+In a list context, returns a list of [WebService::Geocodio::Location](http://search.cpan.org/perldoc?WebService::Geocodio::Location) objects.
+In a scalar context, returns an arrayref of [WebService::Geocodio::Location](http://search.cpan.org/perldoc?WebService::Geocodio::Location)
+objects. The list of objects is presented in descending order of accuracy.
+
+## reverse\_geocode
+
+Send the current list of latitude, longitude pairs to the geocod.io service.
+
+Returns undef if there are no locations stored.
+
+In a list context, returns a list of [WebService::Geocodio::Location](http://search.cpan.org/perldoc?WebService::Geocodio::Location) objects.
+In scalar context, returns an arrayref of [WebService::Geocodio::Location](http://search.cpan.org/perldoc?WebService::Geocodio::Location) 
+objects.  The list of objects is presented in descending order of accuracy.
 
 # AUTHOR
 

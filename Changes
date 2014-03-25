@@ -2,6 +2,11 @@ Change history for WebService-Geocodio
 
 {{$NEXT}}
 
+0.03        2014-03-25
+            Major code refactor 
+            Add support for reverse geocoding
+            Add rudimentary support for geocod.io fields
+
 0.02        2014-01-23
             Fix testing failure when an api key isn't in the environment.
             There are *no* API changes.
