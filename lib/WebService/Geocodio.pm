@@ -23,7 +23,8 @@ with('WebService::Geocodio::Request');
     # Wrigley Field
     my $loc = WebService::Geocodio::Location->new(
         number => 1060,
-        street => 'W Addison',
+        postdirection => 'W',
+        street => 'Addison',
         suffix => 'Street',
         city => 'Chicago',
         state => 'IL',
@@ -44,10 +45,11 @@ with('WebService::Geocodio::Request');
 
 This module is a fairly thin wrapper around the L<Geocod.io|http://geocod.io>
 geocoding web service.  This service currently only supports US based addresses
-and "forward" geocoding where you have a postal address and want to convert to
-latitude/longitude pair.  The library is somewhat finicky about how addresses
-are presented and stored; please read the API documentation thoroughly to make
-sure you're getting the best quality results from the service.
+at the moment.  Both forward and reverse geocoding is supported. 
+
+In my testing, the service is somewhat finicky about how addresses are
+presented and stored; please read the service API documentation thoroughly 
+to make sure you're getting the best quality results from the service.
 
 You will need to obtain a free API key to use this library.
 
@@ -78,6 +80,45 @@ itself to JSON automatically.
 
 has 'locations' => (
     is => 'rw',
+    default => sub { [] },
+);
+
+=attr fields
+
+You may request the following fields be included in the results:
+
+=over 4
+
+=item * cd
+
+Congressional District (for the current Congress)
+
+=item * cd113
+
+Congressional District (for the 113th Congress which runs through 2015)
+
+=item * stateleg
+
+The state legislative divisions for this location. The results include both
+House and Senate, unless the location is unicameral like Nebraska or Washington
+D.C., then only a senate result is given.
+
+=item * timezone
+
+The timezone of this location, UTC offset and whether it observes daylight
+saving time.
+
+=item * school
+
+The unified or elementary/secondary school district identifiers for this location.
+
+=back
+
+=cut
+
+has 'fields' => (
+    is => 'rw',
+    predicate => 1,
     default => sub { [] },
 );
 
@@ -117,6 +158,34 @@ sub clear_locations {
     $self->locations([]);
 }
 
+=method add_field
+
+This method takes one or more fields to include in a result set. Valid fields are:
+
+=over 4
+
+=item * cd
+
+=item * cd113
+
+=item * stateleg
+
+=item * timezone
+
+=item * school
+
+=back
+
+Fields that do not match these valid names are silently discarded. 
+
+=cut
+
+sub add_field {
+    my $self = shift;
+
+    push @{ $self->field }, grep { /cd|cd113|stateleg|timezone|school/ } @_;
+}
+
 =method geocode
 
 Send the current list of locations to the geocod.io service.
@@ -131,6 +200,8 @@ objects. The list of objects is presented in descending order of accuracy.
 
 sub geocode {
     my $self = shift;
+
+    $self->add_location(@_) if scalar @_;
 
     return undef if scalar @{$self->locations} < 1;
 
@@ -154,6 +225,8 @@ objects.  The list of objects is presented in descending order of accuracy.
 sub reverse_geocode {
     my $self = shift;
 
+    $self->add_location(@_) if scalar @_;
+
     return undef if scalar @{$self->locations} < 1;
 
     my @r = $self->send_reverse( $self->_format('reverse') );
@@ -168,17 +241,7 @@ sub _format {
     my $method = $direction eq 'forward' ? '_forward_formatting' 
         : '_reverse_formatting';
 
-    return [ map {; blessed $_ ? $_->$method->() : $_ } @{$self->locations} ];
-}
-
-=method reverse
-
-Synonym for reverse_geocode
-
-=cut
-
-sub reverse {
-    $_[0]->reverse_geocode(shift);
+    return [ map {; blessed $_ ? $_->$method : $_ } @{$self->locations} ];
 }
 
 1;
