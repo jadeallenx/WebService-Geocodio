@@ -20,7 +20,8 @@ my $geo = WebService::Geocodio->new(
 # Wrigley Field
 my $loc = WebService::Geocodio::Location->new(
     number => 1060,
-    street => 'W Addison',
+    postdirection => 'W',
+    street => 'Addison',
     suffix => 'Street',
     city => 'Chicago',
     state => 'IL',
@@ -28,6 +29,6 @@ my $loc = WebService::Geocodio::Location->new(
 
 $geo->add_location($loc, '20050');
 
-map { say $_->city, ": ", $_->lat, ", ", $_->lng, "\n" } $geo->geocode();
+map { say $_->city, ": ", $_->lat, ", ", $_->lng } $geo->geocode();
 
 ok(1);
