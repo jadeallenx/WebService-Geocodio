@@ -10,7 +10,8 @@ plan tests => 17;
 
 my $loc = WebService::Geocodio::Location->new(
     number => 1060,
-    street => 'W Addison',
+    postdirection => 'W',
+    street => 'Addison',
     suffix => 'St',
     city => 'Chicago',
     state => 'IL',
