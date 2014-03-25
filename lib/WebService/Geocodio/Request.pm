@@ -74,8 +74,18 @@ sub send_reverse {
 sub _request {
     my ($self, $op, $content) = @_;
 
-    my $response = $self->ua->request('POST', $self->base_url 
-        . "$op?api_key=" . $self->api_key, { content => $content });
+    my $url;
+    if ( $self->has_fields ) {
+        $url = $self->base_url 
+            . "$op?fields=" . join(',', @{ $self->fields }) 
+            .  "&api_key=" . $self->api_key
+            ;
+    }
+    else {
+        $url = $self->base_url . "$op?api_key=" . $self->api_key;
+    }
+
+    my $response = $self->ua->request('POST', $url, { content => $content });
 
     if ( $response->{success} ) {
         my $hr = $self->decode($response->{content});
