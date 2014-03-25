@@ -16,6 +16,10 @@ Buiding number
 
 A street name identifier
 
+=attr postdirection
+
+A address direction like 'SW' or 'S'
+
 =attr suffix
 
 The type of street 'Ave', 'St', etc.
@@ -52,7 +56,7 @@ The full address as formatted by the service.
 
 =cut
 
-has [qw(number street suffix city state zip formatted lat lng accuracy)] => (
+has [qw(number street suffix postdirection city state zip formatted lat lng accuracy)] => (
     is => 'ro',
     predicate => 1,
 );
@@ -72,7 +76,7 @@ sub BUILDARGS {
         my $hr = $args[0];
         $out->{accuracy} = $hr->{accuracy} if exists $hr->{accuracy};
         $out->{formatted} = $hr->{formatted_address} if exists $hr->{formatted_address};
-        map { $out->{$_} = $hr->{address_components}->{$_} if exists $hr->{address_components}->{$_} } qw(number street suffix city state zip);
+        map { $out->{$_} = $hr->{address_components}->{$_} if exists $hr->{address_components}->{$_} } qw(number street suffix postdirection city state zip);
         map { $out->{$_} = $hr->{location}->{$_} if exists $hr->{location}->{$_} } qw(lat lng);
     }
     elsif ( @args % 2 == 1 ) {
@@ -96,7 +100,15 @@ sub _forward_formatting {
 
     my $s;
     if ( $self->has_number && $self->has_street && $self->suffix ) {
-        $s .= join " ", (map {; $self->$_ } qw(number street suffix));
+        my @f;
+        if ( $self->has_postdirection ) {
+            @f = qw(number postdirection street suffix);
+        }
+        else {
+            @f = qw(number street suffix);
+        }
+
+        $s .= join " ", (map {; $self->$_ } @f);
         $s .= ", ";
     }
 
