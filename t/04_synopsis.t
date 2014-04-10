@@ -29,6 +29,8 @@ my $loc = WebService::Geocodio::Location->new(
 
 $geo->add_location($loc, '20050');
 
-map { say $_->city, ": ", $_->lat, ", ", $_->lng } $geo->geocode();
+$geo->add_field('timezone');
+
+map { say $_->city, ": ", $_->lat, ", ", $_->lng, ", ", $_->fields->timezone->name } $geo->geocode();
 
 ok(1);

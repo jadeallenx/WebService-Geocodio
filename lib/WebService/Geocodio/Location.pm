@@ -3,6 +3,7 @@ use warnings;
 
 package WebService::Geocodio::Location;
 
+use WebService::Geocodio::Fields;
 use Moo::Lax;
 use Carp qw(confess);
 
@@ -56,11 +57,7 @@ The full address as formatted by the service.
 
 =attr fields
 
-A hashref to any fields data requested. Will most likely be replaced by field specific
-classes in the near future. 
-
-For now, the field name and its subkeys are all naked hash keys. (Sorry. This will
-improve.)
+Any requested fields are available here.
 
 =cut
 
@@ -84,7 +81,7 @@ sub BUILDARGS {
         my $hr = $args[0];
         $out->{accuracy} = $hr->{accuracy} if exists $hr->{accuracy};
         $out->{formatted} = $hr->{formatted_address} if exists $hr->{formatted_address};
-        $out->{fields} = $hr->{fields} if exists $hr->{fields};
+        $out->{fields} = WebService::Geocodio::Fields->new($hr->{fields}) if exists $hr->{fields};
         map { $out->{$_} = $hr->{address_components}->{$_} if exists $hr->{address_components}->{$_} } qw(number street suffix postdirection city state zip);
         map { $out->{$_} = $hr->{location}->{$_} if exists $hr->{location}->{$_} } qw(lat lng);
     }
