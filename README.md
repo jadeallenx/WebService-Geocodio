@@ -4,7 +4,7 @@ WebService::Geocodio - A Perl interface to Geocod.io
 
 # VERSION
 
-version 0.03
+version 0.04
 
 # SYNOPSIS
 
@@ -30,12 +30,13 @@ version 0.03
     # 20050 = zip code in Washington DC
     $geo->add_location($loc, '20050');
 
-    # prints:
-    # Chicago: 41.947205791667, -87.656316875
-    # Chicago: 41.947180613636, -87.657167363636
-    # Washington: 38.893311, -77.014647
+    $geo->add_field('timezone');
 
-    map { say $_->city, ": ", $_->lat, ", ", $_->lng } $geo->geocode();
+    # prints:
+    # Chicago: 41.947205791667, -87.656316875, CST
+    # Chicago: 41.947180613636, -87.657167363636, CST
+    # Washington: 38.893311, -77.014647, EST
+    map { say $_->city, ": ", $_->lat, ", ", $_->lng, ", " $_->fields->timezone->name } $geo->geocode();
 
 # OVERVIEW
 
