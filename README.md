@@ -41,8 +41,7 @@ version 0.04
 # OVERVIEW
 
 This module is a fairly thin wrapper around the [Geocod.io](http://geocod.io)
-geocoding web service.  This service currently only supports US based addresses
-at the moment.  Both forward and reverse geocoding is supported. 
+geocoding web service. The service currently supports US and Canadian addresses full coverage map is available at https://geocod.io/coverage/.  Both forward and reverse geocoding is supported. 
 
 In my testing, the service is somewhat finicky about how addresses are
 presented and stored; please read the service API documentation thoroughly 
