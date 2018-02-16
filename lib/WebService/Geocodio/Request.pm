@@ -36,7 +36,7 @@ The base url to use when connecting to the service. Default is 'http://api.geoco
 has 'base_url' => (
     is => 'ro',
     lazy => 1,
-    default => sub { 'http://api.geocod.io/v1/' },
+    default => sub { 'http://api.geocod.io/v1.2/' },
 );
 
 =method send_forward
