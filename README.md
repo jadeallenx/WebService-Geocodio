@@ -4,7 +4,7 @@ WebService::Geocodio - A Perl interface to Geocod.io
 
 # VERSION
 
-version 0.04
+version 0.05
 
 # SYNOPSIS
 
@@ -41,7 +41,8 @@ version 0.04
 # OVERVIEW
 
 This module is a fairly thin wrapper around the [Geocod.io](http://geocod.io)
-geocoding web service. The service currently supports US and Canadian addresses full coverage map is available at https://geocod.io/coverage/.  Both forward and reverse geocoding is supported. 
+geocoding web service.  This service currently supports US and many Canadian based
+addresses at the moment.  Both forward and reverse geocoding is supported.
 
 In my testing, the service is somewhat finicky about how addresses are
 presented and stored; please read the service API documentation thoroughly 
@@ -50,7 +51,7 @@ to make sure you're getting the best quality results from the service.
 You will need to obtain a free API key to use this library.
 
 All errors are fatal and reported by `confess`.  If you want more graceful
-error handling, you might want to try using [Try::Tiny](http://search.cpan.org/perldoc?Try::Tiny).
+error handling, you might want to try using [Try::Tiny](https://metacpan.org/pod/Try::Tiny).
 
 # ATTRIBUTES
 
@@ -61,7 +62,7 @@ This is the geocod.io API key. It is required.
 ## locations
 
 The list of locations you want to geocode.  These can be bare strings (if you like) or
-you can use a fancy object like [WebService::Geocodio::Location](http://search.cpan.org/perldoc?WebService::Geocodio::Location) which will serialize
+you can use a fancy object like [WebService::Geocodio::Location](https://metacpan.org/pod/WebService::Geocodio::Location) which will serialize
 itself to JSON automatically.
 
 ## fields
@@ -70,11 +71,27 @@ You may request the following fields be included in the results:
 
 - cd
 
-    Congressional District (for the current Congress)
+    Congressional District (for the current Congress). This will return detailed
+    biographical information about the Senators and Congressional representative
+    from this district in the `current_legislators` field which is structured
+    as an array where the member of Congress is first, followed by the Senators
+    for the entire state.
+
+    It's possible there may be overlaps in a given location, so this field is
+    structured as an array since there may be 2 or more possible districts
+    for a given location. See the official docs for more information.
 
 - cd113
 
-    Congressional District (for the 113th Congress which runs through 2015)
+    Congressional District (for the 113th Congress which ran through 2015)
+
+- cd114
+
+    Congressional District (for the 114th Congress which ran through 2017)
+
+- cd115
+
+    Congressional District (for the 115th Congress which runs through 2019)
 
 - stateleg
 
@@ -90,6 +107,12 @@ You may request the following fields be included in the results:
 - school
 
     The unified or elementary/secondary school district identifiers for this location.
+
+- census
+
+    Appends various U.S. Census statistical codes to your lookup. See the API docs
+    for more information about these codes and how they can be used with other
+    census data sets.
 
 # METHODS
 
@@ -109,13 +132,16 @@ If you want to clear the current list of locations, use this method.
 
 This method takes one or more fields to include in a result set. Valid fields are:
 
-- cd
+- cd (current Congress)
 - cd113
+- cd114
+- cd115
 - stateleg
 - timezone
 - school
+- census
 
-Fields that do not match these valid names are silently discarded. 
+Fields that do not match these valid names are silently discarded.
 
 ## geocode
 
@@ -123,8 +149,8 @@ Send the current list of locations to the geocod.io service.
 
 Returns undef if there are no locations stored.
 
-In a list context, returns a list of [WebService::Geocodio::Location](http://search.cpan.org/perldoc?WebService::Geocodio::Location) objects.
-In a scalar context, returns an arrayref of [WebService::Geocodio::Location](http://search.cpan.org/perldoc?WebService::Geocodio::Location)
+In a list context, returns a list of [WebService::Geocodio::Location](https://metacpan.org/pod/WebService::Geocodio::Location) objects.
+In a scalar context, returns an arrayref of [WebService::Geocodio::Location](https://metacpan.org/pod/WebService::Geocodio::Location)
 objects. The list of objects is presented in descending order of accuracy.
 
 ## reverse\_geocode
@@ -133,8 +159,8 @@ Send the current list of latitude, longitude pairs to the geocod.io service.
 
 Returns undef if there are no locations stored.
 
-In a list context, returns a list of [WebService::Geocodio::Location](http://search.cpan.org/perldoc?WebService::Geocodio::Location) objects.
-In scalar context, returns an arrayref of [WebService::Geocodio::Location](http://search.cpan.org/perldoc?WebService::Geocodio::Location) 
+In a list context, returns a list of [WebService::Geocodio::Location](https://metacpan.org/pod/WebService::Geocodio::Location) objects.
+In scalar context, returns an arrayref of [WebService::Geocodio::Location](https://metacpan.org/pod/WebService::Geocodio::Location) 
 objects.  The list of objects is presented in descending order of accuracy.
 
 # AUTHOR
@@ -143,7 +169,7 @@ Mark Allen <mrallen1@yahoo.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Mark Allen.
+This software is copyright (c) 2018 by Mark Allen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
