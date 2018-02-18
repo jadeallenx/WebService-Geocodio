@@ -3,7 +3,10 @@ use warnings;
 
 package WebService::Geocodio::JSON;
 
+# ABSTRACT: A JSON de/serializer class
+
 use Moo::Role;
+use strictures 2;
 use JSON;
 use Carp qw(confess);
 

@@ -4,7 +4,8 @@ use warnings;
 package WebService::Geocodio::Location;
 
 use WebService::Geocodio::Fields;
-use Moo::Lax;
+use Moo;
+use strictures 2;
 use Carp qw(confess);
 
 # ABSTRACT: Location object for use with Geocod.io service.
@@ -118,11 +119,13 @@ sub _forward_formatting {
         $s .= ", ";
     }
 
+    if ( $self->has_city && $self->has_state) {
+        $s .= join ", ", (map {; $self->$_ } qw(city state));
+        $s .= " " if ( $self->has_zip );
+    }
+
     if ( $self->has_zip ) {
         $s .= $self->zip
-    }
-    else {
-        $s .= join ", ", (map {; $self->$_ } qw(city state));
     }
 
     return $s;

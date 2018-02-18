@@ -4,9 +4,10 @@ use warnings;
 {
     package WebService::Geocodio::Fields::CongressionalDistrict;
 
-    use Moo::Lax;
+    use Moo;
+    use strictures 2;;
 
-    has [qw(name district_number congress_number congress_years)] => (
+    has [qw(name district_number congress_number proportion congress_years current_legislators)] => (
         is => 'ro',
     );
 
@@ -16,7 +17,9 @@ use warnings;
 
 {
     package WebService::Geocodio::Fields::StateLegislativeDistrict::House;
-    use Moo::Lax;
+
+    use Moo;
+    use strictures 2;;
 
     has [qw(name district_number)] => (
         is => 'ro',
@@ -25,7 +28,9 @@ use warnings;
 
 {
     package WebService::Geocodio::Fields::StateLegislativeDistrict::Senate;
-    use Moo::Lax;
+
+    use Moo;
+    use strictures 2;;
 
     has [qw(name district_number)] => (
         is => 'ro',
@@ -39,7 +44,8 @@ use warnings;
     use WebService::Geocodio::Fields::StateLegislativeDistrict::House;
     use WebService::Geocodio::Fields::StateLegislativeDistrict::Senate;
 
-    use Moo::Lax;
+    use Moo;
+    use strictures 2;;
     use Carp qw(confess);
 
     has [qw(house senate)] => (
@@ -68,7 +74,9 @@ use warnings;
 
 {
     package WebService::Geocodio::Fields::SchoolDistrict::Unified;
-    use Moo::Lax;
+
+    use Moo;
+    use strictures 2;;
 
     has [qw(name lea_code grade_low grade_high)] => (
         is => 'ro',
@@ -77,7 +85,9 @@ use warnings;
 
 {
     package WebService::Geocodio::Fields::SchoolDistrict::Elementary;
-    use Moo::Lax;
+
+    use Moo;
+    use strictures 2;;
 
     has [qw(name lea_code grade_low grade_high)] => (
         is => 'ro',
@@ -86,7 +96,9 @@ use warnings;
 
 {
     package WebService::Geocodio::Fields::SchoolDistrict::Secondary;
-    use Moo::Lax;
+
+    use Moo;
+    use strictures 2;;
 
     has [qw(name lea_code grade_low grade_high)] => (
         is => 'ro',
@@ -101,7 +113,8 @@ use warnings;
     use WebService::Geocodio::Fields::SchoolDistrict::Elementary;
     use WebService::Geocodio::Fields::SchoolDistrict::Secondary;
 
-    use Moo::Lax;
+    use Moo;
+    use strictures 2;;
     use Carp qw(confess);
 
     has [qw(unified elementary secondary)] => (
@@ -131,24 +144,45 @@ use warnings;
 
 {
     package WebService::Geocodio::Fields::Timezone;
-    use Moo::Lax;
+
+    use Moo;
+    use strictures 2;
 
     has [qw(name utc_offset observes_dst)] => (
         is => 'ro',
     );
 }
 
+############################ Census
+
+{
+    package WebService::Geocodio::Fields::Census;
+
+    use Moo;
+    use strictures 2;
+
+    has [qw(state_fips county_fips place_fips tract_code
+        block_group block_code census_year)] => (
+        is => 'ro',
+    );
+
+}
+
 package WebService::Geocodio::Fields;
+
+# ABSTRACT: Modules to represent various fields Geocod.io supports
 
 use WebService::Geocodio::Fields::CongressionalDistrict;
 use WebService::Geocodio::Fields::StateLegislativeDistrict;
 use WebService::Geocodio::Fields::SchoolDistrict;
 use WebService::Geocodio::Fields::Timezone;
+use WebService::Geocodio::Fields::Census;
 
-use Moo::Lax;
+use Moo;
+use strictures 2;
 use Carp qw(confess);
 
-has [qw(cd stateleg school timezone)] => (
+has [qw(cd stateleg school timezone census)] => (
     is => 'rw',
     predicate => 1,
 );
@@ -160,14 +194,16 @@ sub BUILDARGS {
 
     my $out;
 
-    $out->{cd} = WebService::Geocodio::Fields::CongressionalDistrict->new(
-        $hr->{congressional_district}) if exists $hr->{congressional_district};
+    $out->{cd} = [ map { WebService::Geocodio::Fields::CongressionalDistrict->new($_) }
+        @{ $hr->{congressional_districts} } ] if exists $hr->{congressional_districts};
     $out->{stateleg} = WebService::Geocodio::Fields::StateLegislativeDistrict->new(
         $hr->{state_legislative_districts}) if exists $hr->{state_legislative_districts};
     $out->{school} = WebService::Geocodio::Fields::SchoolDistrict->new(
         $hr->{school_districts}) if exists $hr->{school_districts};
-    $out->{timezone} = WebService::Geocodio::Fields::Timezone->new($hr->{timezone}) 
+    $out->{timezone} = WebService::Geocodio::Fields::Timezone->new($hr->{timezone})
         if exists $hr->{timezone};
+    $out->{census} = WebService::Geocodio::Fields::Census->new($hr->{census})
+        if exists $hr->{census};
 
     return $out;
 }

@@ -4,6 +4,7 @@ use warnings;
 package WebService::Geocodio::Request;
 
 use Moo::Role;
+use strictures 2;
 use HTTP::Tiny;
 use Carp qw(confess);
 use WebService::Geocodio::Location;
